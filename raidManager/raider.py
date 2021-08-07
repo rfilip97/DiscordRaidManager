@@ -6,13 +6,11 @@ class Raider:
     discordID = None
     name = None
     desiredRoles = []
-    flex = None
+    flex = False
 
-    def __init__(self, discordID, name, roles, flex=False):
+    def __init__(self, discordID, name):
         self.discordID = discordID
         self.name = name
-        self.flex = flex
-        self.desiredRoles = roles.split(constants.DELIM)
 
     def getName(self):
         return self.name
@@ -25,3 +23,9 @@ class Raider:
 
     def countRoles(self):
         return len(self.desiredRoles)
+
+    def addRole(self, role):
+        self.desiredRoles.append(role)
+
+    def setFlex(self, flex):
+        self.flex = flex

@@ -9,10 +9,14 @@ from raidManager.raid import Raid
 from raidManager.raider import Raider
 from raidManager.role import Role
 
-# discordID, name, roles, flex=False
-raider1 = Raider("#1111", "Kenny", "tank,dps,heal")
-raider2 = Raider("#1234", "Ada", "*", flex=True)
-raider3 = Raider("#1357", "Sonya", "heal")
+# discordID, name
+raider1 = Raider("#1111", "Kenny")
+raider1.addRole("tank")
+raider2 = Raider("#1234", "Ada")
+raider2.addRole("dps")
+raider2.addRole("tank")
+raider3 = Raider("#1357", "Sonya")
+raider3.setFlex(True)
 
 # name, spots
 role1 = Role("dps", "7")
