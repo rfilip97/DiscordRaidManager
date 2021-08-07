@@ -1,3 +1,5 @@
+from collections.abc import Sequence
+import asyncio
 import os
 import discord
 import random
@@ -5,6 +7,7 @@ import datetime
 import random
 
 from gw2.gw2 import Gw2
+from discord.ext import commands
 
 TOKEN = os.getenv('DISCORD_TOKEN')
 KEY = "!yk"
@@ -26,6 +29,50 @@ class Yukki:
 async def on_ready():
     print(f'{bot.user} has connected to Discord!')
     await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=KEY))
+
+
+### Aux ###
+def make_sequence(seq):
+    if seq is None:
+        return ()
+    if isinstance(seq, Sequence) and not isinstance(seq, str):
+        return seq
+    else:
+        return (seq,)
+
+
+def message_check(channel=None, author=None, content=None):
+    channel = make_sequence(channel)
+    author = make_sequence(author)
+    content = make_sequence(content)
+
+    def check(message):
+        if message.author.bot:
+            return False
+        if channel and message.channel not in channel:
+            return False
+        if author and message.author not in author:
+            return False
+        actual_content = message.content
+        if content and actual_content not in content:
+            return False
+        return True
+    return check
+
+
+### Commands ###
+async def dm(user, message):
+    asyncio.create_task(user.send(message))
+
+
+async def start_raid_form(message):
+    author = message.author
+    await dm(author, "Hey! Let's start filling the raid form ^^")
+
+    response = await bot.wait_for('message', check=message_check(channel=message.author.dm_channel))
+    while response.content.lower() != "finish":
+        await dm(author, "Received: " + response.content + ". Type 'finish' to stop")
+        response = await bot.wait_for('message', check=message_check(channel=message.author.dm_channel))
 
 
 ### REPLY ###
@@ -73,4 +120,12 @@ async def on_message(message):
                         name="Daily fractals " + tier, value=frac_str, inline=False)
                     await message.channel.send(embed=embedVar)
                     return
-        ### /GW2 ###
+
+        ### raid formular ###
+        # i.e. !yk start raid
+        # i.e. !yk raid start
+        if len(words) == 3:
+            words[1] = words[1].lower()
+            words[2] = words[2].lower()
+            if ((words[1] == "start" and words[2] == "raid") or (words[1] == "raid" and words[2] == "start")):
+                await start_raid_form(message)

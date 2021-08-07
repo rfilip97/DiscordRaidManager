@@ -1,7 +1,7 @@
 from raidManager.yukki import Yukki
 
-#yukki = Yukki()
-# yukki.run()
+yukki = Yukki()
+yukki.run()
 
 
 ###############################
