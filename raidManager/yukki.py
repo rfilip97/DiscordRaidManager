@@ -74,15 +74,18 @@ async def start_raid_form(message):
     form = Form(message)
     form.addTitle(title.content)
 
-    await dm(author, "Enter [player: role]. Type 'finish' to exit:")
+    roles = ""
+    await dm(author, "Enter [:emote:-role]. Type 'finish' to exit:")
     response = await bot.wait_for('message', check=message_check(channel=message.author.dm_channel))
     while response.content.lower() != "finish":
 
-        response = response.content.split(":")
-        form.addField(response[0], response[1])
-        await dm(author, "Enter [player: role]. Type 'finish' to exit:")
+        response = response.content.split("-")
+        roles += response[0] + " -> " + response[1]
+        roles += "\n"
+        await dm(author, "Enter [:emote:-role]. Type 'finish' to exit:")
         response = await bot.wait_for('message', check=message_check(channel=message.author.dm_channel))
 
+    form.addField("roles", roles)
     await form.publish()
 
 
