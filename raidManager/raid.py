@@ -12,8 +12,7 @@ class Raid:
     serverId = None
     channelId = None
 
-    roles = []
-    players = []
+    roles = {}  # key: role.name, value: role
 
     def __init__(self, name, description, raidLeader, date, time, serverId, channelId):
         self.name = name
@@ -28,7 +27,21 @@ class Raid:
         return self.name
 
     def addRole(self, role):
-        self.roles.append(role)
+        self.roles[role.getName()] = role
 
-    def addPlayer(self, player):
-        self.players.append(player)
+    def printRoles(self):
+        for role in self.roles:
+            print("-----------------")
+            print("Role: " + role)
+            print("Players:")
+            self.roles[role].printPlayers()
+
+    def addPlayer(self, player, role):
+        if role not in self.roles:
+            print("Invalid role: " + role)
+            return
+        print("Adding {} to {}".format(player.getName(), role))
+        self.roles[role].addPlayer(player)
+
+    def removePlayer(self, player, role):
+        self.roles[role].removePlayer(player)

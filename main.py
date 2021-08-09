@@ -1,7 +1,7 @@
 from raidManager.yukki import Yukki
 
-yukki = Yukki()
-yukki.run()
+#yukki = Yukki()
+# yukki.run()
 
 
 ###############################
@@ -11,10 +11,7 @@ from raidManager.role import Role
 
 # discordID, name
 raider1 = Raider("#1111", "Kenny")
-raider1.addRole("tank")
 raider2 = Raider("#1234", "Ada")
-raider2.addRole("dps")
-raider2.addRole("tank")
 raider3 = Raider("#1357", "Sonya")
 raider3.setFlex(True)
 
@@ -26,9 +23,13 @@ role3 = Role("tank", "1")
 # name, description, raidLeader, date, time, serverId
 raid = Raid("Spirit Vale", "Training Run", "Yukki-kun",
             "12.04.2021", "18:00", "#1111", "#9999")
-raid.addPlayer(raider1)
-raid.addPlayer(raider2)
-raid.addPlayer(raider3)
 raid.addRole(role1)
 raid.addRole(role2)
 raid.addRole(role3)
+
+raid.addPlayer(raider1, "dps")
+raid.addPlayer(raider2, "healer")
+raid.printRoles()
+
+raid.removePlayer("Kenny", "dps")
+raid.printRoles()
