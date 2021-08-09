@@ -8,6 +8,7 @@ import random
 
 from gw2.gw2 import Gw2
 from discord.ext import commands
+from raidManager.form import Form
 
 TOKEN = os.getenv('DISCORD_TOKEN')
 KEY = "!yk"
@@ -67,12 +68,22 @@ async def dm(user, message):
 
 async def start_raid_form(message):
     author = message.author
-    await dm(author, "Hey! Let's start filling the raid form ^^")
+    await dm(author, "Hey! Let's start filling the raid form ^^\nPlease submit raid title:")
+    title = await bot.wait_for('message', check=message_check(channel=message.author.dm_channel))
 
+    form = Form(message)
+    form.addTitle(title.content)
+
+    await dm(author, "Enter [player: role]. Type 'finish' to exit:")
     response = await bot.wait_for('message', check=message_check(channel=message.author.dm_channel))
     while response.content.lower() != "finish":
-        await dm(author, "Received: " + response.content + ". Type 'finish' to stop")
+
+        response = response.content.split(":")
+        form.addField(response[0], response[1])
+        await dm(author, "Enter [player: role]. Type 'finish' to exit:")
         response = await bot.wait_for('message', check=message_check(channel=message.author.dm_channel))
+
+    await form.publish()
 
 
 ### REPLY ###

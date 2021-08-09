@@ -1,10 +1,9 @@
 from raidManager.yukki import Yukki
 
-#yukki = Yukki()
-# yukki.run()
+yukki = Yukki()
+yukki.run()
 
-
-###############################
+'''###############################
 from raidManager.raid import Raid
 from raidManager.raider import Raider
 from raidManager.role import Role
@@ -32,4 +31,4 @@ raid.addPlayer(raider2, "healer")
 raid.printRoles()
 
 raid.removePlayer("Kenny", "dps")
-raid.printRoles()
+raid.printRoles()'''
