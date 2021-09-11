@@ -181,5 +181,13 @@ async def on_reaction_add(reaction, user):
     if reaction.message.id == Yukki.handler.id:
         emj = extract_emoji(str(reaction.emoji))
         raider = Raider(str(user))
-        Yukki.raid.addPlayer(raider, Yukki.raid.getRoleByEmoji(emj))
+        role = Yukki.raid.getRoleByEmoji(emj)
+
+        # Remove already existing player
+        if str(user) in Yukki.raid.roles[role].getPlayers():
+            Yukki.raid.removePlayer(str(user), role)
+        # Add the player
+        else:
+            Yukki.raid.addPlayer(raider, role)
+
         await Yukki.prepare_form(edit=True)

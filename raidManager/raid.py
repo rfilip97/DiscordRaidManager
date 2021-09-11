@@ -75,3 +75,6 @@ class Raid:
 
     def removePlayer(self, player, role):
         self.roles[role].removePlayer(player)
+
+    def removePlayer(self, player, role):
+        self.roles[role].removePlayer(player)
