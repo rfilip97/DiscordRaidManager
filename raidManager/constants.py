@@ -1,2 +1,2 @@
 DELIM = ","
-NO_PLAYERS_SIGNED_STR = "NA"
+NO_PLAYERS_SIGNED_STR = "*Not Available*"
