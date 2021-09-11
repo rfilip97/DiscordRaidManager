@@ -1,4 +1,5 @@
 from collections.abc import Sequence
+import re
 
 
 def get_emoji_list(ctx):
@@ -17,6 +18,12 @@ def get_formated_emoji(emoji, emoji_list):
         print("Exception!!")
     finally:
         return formatted_emoji
+
+def extract_emoji(formatted_emoji):
+    EMOJI_REGEX = "^<:(.*):[0-9]+>$"
+    match = re.search(EMOJI_REGEX, formatted_emoji)
+    return match.group(1)
+
 
 def list_to_str(list):
     final_string = ""

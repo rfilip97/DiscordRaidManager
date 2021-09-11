@@ -15,6 +15,9 @@ class Form:
     def addField(self, name, value):
         self.embed.add_field(name=name, value=value, inline=False)
 
+    def getEmbed(self):
+        return self.embed
+
     async def publish(self):
         handler = await self.channel.send(embed=self.embed)
         return handler

@@ -7,7 +7,7 @@ class Raider:
     name = None
     flex = False
 
-    def __init__(self, discordID, name):
+    def __init__(self, name, discordID=None):
         self.discordID = discordID
         self.name = name
 

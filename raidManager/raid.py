@@ -1,5 +1,6 @@
 from raidManager import raider
 from raidManager import role
+from raidManager.constants import NO_PLAYERS_SIGNED_STR
 
 
 class Raid:
@@ -53,6 +54,12 @@ class Raid:
             ret += self.roles[role].getPlayers()
         return ret
 
+    def getPlayersByRole(self, role):
+        try:
+            return self.roles[role].getPlayers()
+        except:
+            return NO_PLAYERS_SIGNED_STR
+
     def printRoles(self):
         for role in self.roles:
             print("-----------------")
@@ -64,7 +71,6 @@ class Raid:
         if role not in self.roles:
             print("Invalid role: " + role)
             return
-        print("Adding {} to {}".format(player.getName(), role))
         self.roles[role].addPlayer(player)
 
     def removePlayer(self, player, role):

@@ -1,3 +1,5 @@
+from raidManager.constants import NO_PLAYERS_SIGNED_STR
+
 class Role:
 
     name = None
@@ -21,6 +23,9 @@ class Role:
         ret = []
         for player in self.players:
             ret.append(player)
+
+        if len(ret) == 0:
+            return NO_PLAYERS_SIGNED_STR
         return ret
 
     def addPlayer(self, player):
