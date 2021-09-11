@@ -1,1 +1,2 @@
 DELIM = ","
+NO_PLAYERS_SIGNED_STR = "NA"

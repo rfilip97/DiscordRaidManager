@@ -3,11 +3,11 @@ import discord
 
 class Form:
 
-    ctx = None
+    channel = None
     embed = None
 
-    def __init__(self, ctx):
-        self.ctx = ctx
+    def __init__(self, channel):
+        self.channel = channel
 
     def addTitle(self, title):
         self.embed = discord.Embed(title=title, color=0x0066ff)
@@ -16,4 +16,5 @@ class Form:
         self.embed.add_field(name=name, value=value, inline=False)
 
     async def publish(self):
-        await self.ctx.channel.send(embed=self.embed)
+        handler = await self.channel.send(embed=self.embed)
+        return handler

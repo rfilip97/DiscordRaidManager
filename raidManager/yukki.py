@@ -8,8 +8,11 @@ import random
 
 from gw2.gw2 import Gw2
 from discord.ext import commands
+from raidManager.constants import NO_PLAYERS_SIGNED_STR
 from raidManager.form import Form
-from utils.utils import message_check
+from raidManager.raid import Raid
+from raidManager.role import Role
+from utils.utils import message_check, get_emoji_list, list_to_str, get_formated_emoji
 
 TOKEN = os.getenv('DISCORD_TOKEN')
 KEY = "!yk"
@@ -18,6 +21,11 @@ bot = discord.Client()
 
 
 class Yukki:
+
+    channel = None
+    form = None
+    handler = None
+    raid = Raid()
 
     def __init__(self):
         pass
@@ -28,35 +36,75 @@ class Yukki:
     async def dm(user, message):
         asyncio.create_task(user.send(message))
 
+    async def react(emoji, emoji_list):
+        emj = get_formated_emoji(emoji, emoji_list)
+        await Yukki.handler.add_reaction(emj)
+
+    async def prepare_form(server_emojis):
+
+        form = Form(Yukki.channel)
+        form.addTitle(Yukki.raid.getName())
+
+        players = Yukki.raid.getPlayers()
+        roles = Yukki.raid.getRoles()
+        print(str(players))
+        print(str(roles))
+
+        for role in roles:
+            emoji = Yukki.raid.getEmojiByRole(role)
+            if emoji in server_emojis:
+                emj = get_formated_emoji(emoji, server_emojis)
+                emj = emj[:1] + ":" + emj[1:]
+                form.addField("{}{}".format(emj, role), NO_PLAYERS_SIGNED_STR)
+
+        Yukki.handler = await form.publish()
+        
+        # React with the selected emojis
+        for role in roles:
+            print("Looking for the emoji for role: " + role)
+            emoji = Yukki.raid.getEmojiByRole(role)
+            print("Found emoji: " + emoji)
+            await Yukki.react(emoji, server_emojis)
+
+
     async def start_raid_form(message):
         author = message.author
         await Yukki.dm(author, "Hey! Let's start filling the raid form ^^\nPlease submit raid title:")
         title = await bot.wait_for('message', check=message_check(channel=message.author.dm_channel))
 
-        form = Form(message)
-        form.addTitle(title.content)
+        Yukki.channel = message.channel
+        Yukki.raid.setName(title.content)
 
         roles = ""
         await Yukki.dm(author, "Enter [:emote:-role]. Type 'finish' to exit:")
         response = await bot.wait_for('message', check=message_check(channel=message.author.dm_channel))
-        while response.content.lower() != "finish":
 
+        emojis = []
+        roles = []
+        while response.content.lower() != "finish":
             response = response.content.split("-")
-            roles += response[0] + " -> " + response[1]
-            roles += "\n"
+            emojis.append(response[0])
+            roles.append(response[1])
             await Yukki.dm(author, "Enter [:emote:-role]. Type 'finish' to exit:")
             response = await bot.wait_for('message', check=message_check(channel=message.author.dm_channel))
 
-        form.addField("roles", roles)
-        await form.publish()
+        server_emojis = get_emoji_list(message)
+        
+        ct = 0
+        for emoji in emojis:
+            print("Adding: {} = {}".format(emoji, roles[ct]))
+            role = Role(roles[ct], emoji)
+            Yukki.raid.addRole(role)
+            ct += 1
 
+        Yukki.raid.printRoles()
+        await Yukki.prepare_form(server_emojis)
 
 ### READY ###
 @bot.event
 async def on_ready():
     print(f'{bot.user} has connected to Discord!')
     await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=KEY))
-
 
 ### REPLY ###
 @bot.event
@@ -112,3 +160,15 @@ async def on_message(message):
             words[2] = words[2].lower()
             if ((words[1] == "start" and words[2] == "raid") or (words[1] == "raid" and words[2] == "start")):
                 await Yukki.start_raid_form(message)
+
+### REPLY ###
+@bot.event
+async def on_reaction_add(reaction, user):
+    # Ignore the reacts comming from the bot
+    if user == bot.user:
+        return
+
+    if reaction.message.id == Yukki.handler.id:
+        print("Yes")
+        print(str(reaction))
+        print("Emoji: " + Yukki.raid.getRoleByEmoji(reaction))

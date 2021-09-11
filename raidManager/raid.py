@@ -14,7 +14,7 @@ class Raid:
 
     roles = {}  # key: role.name, value: role
 
-    def __init__(self, name, description, raidLeader, date, time, serverId, channelId):
+    def __init__(self, name=None, description=None, raidLeader=None, date=None, time=None, serverId=None, channelId=None):
         self.name = name
         self.description = description
         self.raidLeader = raidLeader
@@ -28,6 +28,30 @@ class Raid:
 
     def addRole(self, role):
         self.roles[role.getName()] = role
+
+    def setName(self, name):
+        self.name = name
+
+    def getRoles(self):
+        ret = []
+        for role in self.roles:
+           ret.append(role)
+        return ret
+
+    def getRoleByEmoji(self, emoji):
+        for role in self.roles:
+            if self.roles[role].emoji == emoji:
+                return role
+        return ""
+
+    def getEmojiByRole(self, role):
+        return self.roles[role].emoji
+
+    def getPlayers(self):
+        ret = []
+        for role in self.roles:
+            ret += self.roles[role].getPlayers()
+        return ret
 
     def printRoles(self):
         for role in self.roles:

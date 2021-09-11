@@ -1,6 +1,29 @@
 from collections.abc import Sequence
 
 
+def get_emoji_list(ctx):
+    emojis = {}
+    for emoji in ctx.guild.emojis:
+        emojis[emoji.name]=emoji.id
+    return emojis
+
+def get_formated_emoji(emoji, emoji_list):
+    formatted_emoji = ""
+    print(str(emoji_list))
+    try:
+        emoji_id = emoji_list[emoji]
+        formatted_emoji = "<{name}:{id}>".format(name=emoji, id=emoji_id)
+    except:
+        print("Exception!!")
+    finally:
+        return formatted_emoji
+
+def list_to_str(list):
+    final_string = ""
+    for item in list:
+        final_string += item + "\n"
+    return final_string
+
 def make_sequence(seq):
     if seq is None:
         return ()
@@ -8,7 +31,6 @@ def make_sequence(seq):
         return seq
     else:
         return (seq,)
-
 
 def message_check(channel=None, author=None, content=None):
     channel = make_sequence(channel)
