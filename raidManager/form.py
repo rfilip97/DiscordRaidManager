@@ -13,7 +13,7 @@ class Form:
         self.embed = discord.Embed(title=title, color=0x0066ff)
 
     def addField(self, name, value):
-        self.embed.add_field(name=name, value=value, inline=False)
+        self.embed.add_field(name=name, value=value, inline=True)
 
     def getEmbed(self):
         return self.embed
