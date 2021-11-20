@@ -2,12 +2,10 @@
 import asyncio
 import os
 import discord
-import random
 import datetime
 import random
 
 from gw2.gw2 import Gw2
-from discord.ext import commands
 from raidManager.constants import NO_PLAYERS_SIGNED_STR
 from raidManager.form import Form
 from raidManager.raid import Raid
@@ -21,7 +19,7 @@ KEY = "!yk"
 bot = discord.Client()
 
 
-class Yukki:
+class RaidManager:
 
     channel = None
     form = None
@@ -40,23 +38,23 @@ class Yukki:
 
     async def react(emoji, emoji_list):
         emj = get_formated_emoji(emoji, emoji_list)
-        await Yukki.handler.add_reaction(emj)
+        await RaidManager.handler.add_reaction(emj)
 
     async def prepare_form(edit = False):
 
-        form = Form(Yukki.channel)
-        form.addTitle(Yukki.raid.getName())
+        form = Form(RaidManager.channel)
+        form.addTitle(RaidManager.raid.getName())
 
-        players = Yukki.raid.getPlayers()
-        roles = Yukki.raid.getRoles()
+        players = RaidManager.raid.getPlayers()
+        roles = RaidManager.raid.getRoles()
 
         for role in roles:
-            emoji = Yukki.raid.getEmojiByRole(role)
-            if emoji in Yukki.server_emojis:
-                emj = get_formated_emoji(emoji, Yukki.server_emojis)
+            emoji = RaidManager.raid.getEmojiByRole(role)
+            if emoji in RaidManager.server_emojis:
+                emj = get_formated_emoji(emoji, RaidManager.server_emojis)
                 emj = emj[:1] + ":" + emj[1:]
 
-                players = Yukki.raid.getPlayersByRole(role)
+                players = RaidManager.raid.getPlayersByRole(role)
                 if players != NO_PLAYERS_SIGNED_STR:
                     tmp_players = ""
                     for player in players:
@@ -67,27 +65,27 @@ class Yukki:
 
         # Send the form
         if edit == False:
-            Yukki.handler = await form.publish()
+            RaidManager.handler = await form.publish()
 
             # React with the selected emojis
             for role in roles:
-                emoji = Yukki.raid.getEmojiByRole(role)
-                await Yukki.react(emoji, Yukki.server_emojis)
+                emoji = RaidManager.raid.getEmojiByRole(role)
+                await RaidManager.react(emoji, RaidManager.server_emojis)
 
         # Edit the form
         else:
-            await Yukki.handler.edit(embed=form.getEmbed())
+            await RaidManager.handler.edit(embed=form.getEmbed())
 
     async def start_raid_form(message):
         author = message.author
-        await Yukki.dm(author, "Hey! Let's start filling the raid form ^^\nPlease submit raid title:")
+        await RaidManager.dm(author, "Hey! Let's start filling the raid form ^^\nPlease submit raid title:")
         title = await bot.wait_for('message', check=message_check(channel=message.author.dm_channel))
 
-        Yukki.channel = message.channel
-        Yukki.raid.setName(title.content)
+        RaidManager.channel = message.channel
+        RaidManager.raid.setName(title.content)
 
         roles = ""
-        await Yukki.dm(author, "Enter [:emote:-role]. Type 'finish' to exit:")
+        await RaidManager.dm(author, "Enter [:emote:-role]. Type 'finish' to exit:")
         response = await bot.wait_for('message', check=message_check(channel=message.author.dm_channel))
 
         emojis = []
@@ -96,19 +94,19 @@ class Yukki:
             response = response.content.split("-")
             emojis.append(response[0])
             roles.append(response[1])
-            await Yukki.dm(author, "Enter [:emote:-role]. Type 'finish' to exit:")
+            await RaidManager.dm(author, "Enter [:emote:-role]. Type 'finish' to exit:")
             response = await bot.wait_for('message', check=message_check(channel=message.author.dm_channel))
 
-        Yukki.server_emojis = get_emoji_list(message)
+        RaidManager.server_emojis = get_emoji_list(message)
         
         ct = 0
         for emoji in emojis:
             role = Role(roles[ct], emoji)
-            Yukki.raid.addRole(role)
+            RaidManager.raid.addRole(role)
             ct += 1
 
-        Yukki.raid.printRoles()
-        await Yukki.prepare_form()
+        RaidManager.raid.printRoles()
+        await RaidManager.prepare_form()
 
 ### READY ###
 @bot.event
@@ -169,7 +167,7 @@ async def on_message(message):
             words[1] = words[1].lower()
             words[2] = words[2].lower()
             if ((words[1] == "start" and words[2] == "raid") or (words[1] == "raid" and words[2] == "start")):
-                await Yukki.start_raid_form(message)
+                await RaidManager.start_raid_form(message)
 
 ### REPLY ###
 @bot.event
@@ -178,16 +176,16 @@ async def on_reaction_add(reaction, user):
     if user == bot.user:
         return
 
-    if reaction.message.id == Yukki.handler.id:
+    if reaction.message.id == RaidManager.handler.id:
         emj = extract_emoji(str(reaction.emoji))
         raider = Raider(str(user))
-        role = Yukki.raid.getRoleByEmoji(emj)
+        role = RaidManager.raid.getRoleByEmoji(emj)
 
         # Remove already existing player
-        if str(user) in Yukki.raid.roles[role].getPlayers():
-            Yukki.raid.removePlayer(str(user), role)
+        if str(user) in RaidManager.raid.roles[role].getPlayers():
+            RaidManager.raid.removePlayer(str(user), role)
         # Add the player
         else:
-            Yukki.raid.addPlayer(raider, role)
+            RaidManager.raid.addPlayer(raider, role)
 
-        await Yukki.prepare_form(edit=True)
+        await RaidManager.prepare_form(edit=True)
