@@ -106,13 +106,17 @@ class RaidManager:
         RaidManager.raid.printRoles()
         await RaidManager.prepare_form()
 
+##################
+##### EVENTS #####
+##################
+
 ### READY ###
 @bot.event
 async def on_ready():
     print(f'{bot.user} has connected to Discord!')
     await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=KEY))
 
-### REPLY ###
+### MESSAGE REPLY ###
 @bot.event
 async def on_message(message):
 
@@ -138,7 +142,7 @@ async def on_message(message):
             if ((words[1] == "start" and words[2] == "raid") or (words[1] == "raid" and words[2] == "start")):
                 await RaidManager.start_raid_form(message)
 
-### REPLY ###
+### REACTION REPLY ###
 @bot.event
 async def on_reaction_add(reaction, user):
     # Ignore the reacts comming from the bot
